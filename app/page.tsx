@@ -127,6 +127,7 @@ export default function TodoApp() {
               <AnimatePresence>
                 {tasks
                   .filter((task) => task.completed)
+                  .reverse()
                   .map((task) => (
                     <React.Fragment key={task.id}>
                       <RanderTask
