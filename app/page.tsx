@@ -1,9 +1,6 @@
-// DarkTodoApp.tsx
-
 "use client";
-
 import React, { useState } from "react";
-import RanderTask from "@/app/components/RanderTask"; // Import RanderTask component
+import RanderTask from "@/app/components/RanderTask";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";

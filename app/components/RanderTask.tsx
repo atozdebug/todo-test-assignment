@@ -1,6 +1,5 @@
 "use client";
-
-import { Task } from "@/app/page"; // Adjust the path if needed
+import { Task } from "@/app/page";
 import { motion } from "framer-motion";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
