@@ -18,13 +18,17 @@ export interface Task {
   title: string;
   completed: boolean;
   date: string;
+  completedAt?: number | null;
+  unchecked?: number | null;
 }
 
 export default function TodoApp() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  console.log("🚀 ~ file: page.tsx:27 ~ TodoApp ~ tasks:", tasks);
   const [newTask, setNewTask] = useState<string>("");
   const [newTaskDate, setNewTaskDate] = useState<string>("");
   const [showCompleted, setShowCompleted] = useState<boolean>(false);
+
   // useEffect(() => {
   //   const storedTasks = sessionStorage.getItem("tasks");
   //   if (storedTasks) {
@@ -51,8 +55,16 @@ export default function TodoApp() {
 
   const toggleTask = (id: number) => {
     const updatedTasks = tasks.map((task) =>
-      task.id === id ? { ...task, completed: !task.completed } : task
+      task.id === id
+        ? {
+            ...task,
+            completed: !task.completed,
+            completedAt: !task.completed ? Date.now() : null,
+            unchecked: task.completed ? Date.now() : null,
+          }
+        : task
     );
+
     setTasks(updatedTasks);
 
     // sessionStorage.setItem("tasks", JSON.stringify(updatedTasks));
@@ -89,7 +101,7 @@ export default function TodoApp() {
             <AnimatePresence>
               {tasks
                 .filter((task) => !task.completed)
-                .reverse()
+                .sort((a, b) => (b.id ?? 0) - (a.id ?? 0))
                 .map((task) => (
                   <React.Fragment key={task.id}>
                     <RanderTask
@@ -124,7 +136,7 @@ export default function TodoApp() {
               <AnimatePresence>
                 {tasks
                   .filter((task) => task.completed)
-                  .reverse()
+                  .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0))
                   .map((task) => (
                     <React.Fragment key={task.id}>
                       <RanderTask
