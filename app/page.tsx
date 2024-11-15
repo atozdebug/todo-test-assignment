@@ -1,101 +1,200 @@
-import Image from "next/image";
+// DarkTodoApp.tsx
 
-export default function Home() {
+"use client";
+
+import React, { useEffect, useState } from "react";
+import RanderTask from "@/app/components/RanderTask"; // Import RanderTask component
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  ChevronRight,
+  ChevronDown,
+  CalendarDays,
+  PlusCircle,
+} from "lucide-react";
+import { AnimatePresence } from "framer-motion";
+import { Separator } from "@/components/ui/separator";
+
+export interface Task {
+  id: number;
+  title: string;
+  completed: boolean;
+  date: string;
+}
+
+export default function TodoApp() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [newTask, setNewTask] = useState<string>("");
+  const [newTaskDate, setNewTaskDate] = useState<string>("");
+  const [showCompleted, setShowCompleted] = useState<boolean>(false);
+  useEffect(() => {
+    const storedTasks = sessionStorage.getItem("tasks");
+    if (storedTasks) {
+      setTasks(JSON.parse(storedTasks));
+    }
+  }, []);
+  const addTask = () => {
+    if (newTask.trim() !== "") {
+      const updatedTasks = [
+        ...tasks,
+        {
+          id: Date.now(),
+          title: newTask,
+          completed: false,
+          date: newTaskDate,
+        },
+      ];
+      setTasks(updatedTasks);
+      sessionStorage.setItem("tasks", JSON.stringify(updatedTasks));
+      setNewTask("");
+      setNewTaskDate("");
+    }
+  };
+
+  const toggleTask = (id: number) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const deleteTask = (id: number) => {
+    const updatedTasks = tasks.filter((task) => task.id !== id);
+    setTasks(updatedTasks);
+    sessionStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  };
+
+  const updateTaskTitle = (id: number, newTitle: string) => {
+    if (newTitle.trim() !== "") {
+      const updatedTasks = tasks.map((task) =>
+        task.id === id ? { ...task, title: newTitle.trim() } : task
+      );
+      setTasks(updatedTasks);
+      sessionStorage.setItem("tasks", JSON.stringify(updatedTasks));
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen  flex justify-center max-h-screen bg-slate-50 p-4">
+      <Card className="max-w-[90dvw] min-w-[90dvw]  max-h-full   border-0   text-black/80 flex  p-4">
+        <CardContent className="w-full  flex justify-between flex-col !p-0 md:p-6">
+          <div className=" mb-6">
+            <h1 className="text-2xl font-bold text-blue-400 mb-2">Todo List</h1>
+            <Separator />
+          </div>
+          <div
+            className="flex flex-col  justify-between overflow-y-auto scroll-smooth "
+            style={{ scrollbarWidth: "thin" }}
+          >
+            <AnimatePresence>
+              {tasks
+                .filter((task) => !task.completed)
+                .reverse()
+                .map((task) => (
+                  <React.Fragment key={task.id}>
+                    <RanderTask
+                      task={task}
+                      toggleTask={toggleTask}
+                      deleteTask={deleteTask}
+                      updateTaskTitle={updateTaskTitle}
+                    />
+                    {/* {index !== tasks.length - 1 && <Separator />} */}
+                  </React.Fragment>
+                ))}
+            </AnimatePresence>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            {tasks.filter((t) => t.completed).length > 0 && (
+              <div className="mt-4 mb-2">
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowCompleted(!showCompleted)}
+                  className="text-gray-400 px-4"
+                >
+                  {showCompleted ? (
+                    <ChevronDown className="h-4 w-4 mr-2" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 mr-2" />
+                  )}
+                  Completed {tasks.filter((t) => t.completed).length}
+                </Button>
+              </div>
+            )}
+
+            {showCompleted && (
+              <AnimatePresence>
+                {tasks
+                  .filter((task) => task.completed)
+                  .map((task) => (
+                    <React.Fragment key={task.id}>
+                      <RanderTask
+                        task={task}
+                        toggleTask={toggleTask}
+                        deleteTask={deleteTask}
+                        updateTaskTitle={updateTaskTitle}
+                      />
+                      {/* {index !== tasks.length - 1 && <Separator />} */}
+                    </React.Fragment>
+                  ))}
+              </AnimatePresence>
+            )}
+          </div>
+
+          <div className="flex  gap-1 items-center justify-center w-full">
+            <div className="grow  flex items-center gap-2 border rounded-md border-gray-300 px-1">
+              <div className="flex-grow items-center flex gap-2 ">
+                <Input
+                  type="text"
+                  value={newTask}
+                  onChange={(e) => setNewTask(e.target.value)}
+                  placeholder="Add your task..."
+                  className="flex-grow  border-none text-sm h-10  focus:ring-0 focus:!ring-transparent "
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && newTask.trim() !== "") {
+                      addTask();
+                    }
+                  }}
+                />
+
+                <div className="relative flex gap-1 items-center ">
+                  <span className=" text-xs md:text-sm w-10 md:w-20">
+                    {newTaskDate !== "" && newTaskDate}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className=" text-gray-800   focus:ring-0"
+                    onClick={() => {
+                      const picker = document.getElementById(
+                        "date-picker"
+                      ) as HTMLInputElement;
+                      picker?.showPicker();
+                    }}
+                  >
+                    <CalendarDays className="h-4 w-4 self" />
+                  </Button>
+                  <Input
+                    id="date-picker"
+                    type="date"
+                    value={newTaskDate}
+                    onChange={(e) => setNewTaskDate(e.target.value)}
+                    className="sr-only"
+                  />
+                </div>
+              </div>
+            </div>
+            <Button
+              className="flex items-center !h-10 bg-[#60a5fa] gap-1"
+              size={"sm"}
+              onClick={addTask}
+            >
+              <PlusCircle />
+              <span>Add</span>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
