@@ -28,12 +28,12 @@ export default function TodoApp() {
   const [newTask, setNewTask] = useState<string>("");
   const [newTaskDate, setNewTaskDate] = useState<string>("");
   const [showCompleted, setShowCompleted] = useState<boolean>(false);
-  useEffect(() => {
-    const storedTasks = sessionStorage.getItem("tasks");
-    if (storedTasks) {
-      setTasks(JSON.parse(storedTasks));
-    }
-  }, []);
+  // useEffect(() => {
+  //   const storedTasks = sessionStorage.getItem("tasks");
+  //   if (storedTasks) {
+  //     setTasks(JSON.parse(storedTasks));
+  //   }
+  // }, []);
   const addTask = () => {
     if (newTask.trim() !== "") {
       const updatedTasks = [
@@ -46,24 +46,25 @@ export default function TodoApp() {
         },
       ];
       setTasks(updatedTasks);
-      sessionStorage.setItem("tasks", JSON.stringify(updatedTasks));
+      // sessionStorage.setItem("tasks", JSON.stringify(updatedTasks));
       setNewTask("");
       setNewTaskDate("");
     }
   };
 
   const toggleTask = (id: number) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
-      )
+    const updatedTasks = tasks.map((task) =>
+      task.id === id ? { ...task, completed: !task.completed } : task
     );
+    setTasks(updatedTasks);
+
+    // sessionStorage.setItem("tasks", JSON.stringify(updatedTasks));
   };
 
   const deleteTask = (id: number) => {
     const updatedTasks = tasks.filter((task) => task.id !== id);
     setTasks(updatedTasks);
-    sessionStorage.setItem("tasks", JSON.stringify(updatedTasks));
+    // sessionStorage.setItem("tasks", JSON.stringify(updatedTasks));
   };
 
   const updateTaskTitle = (id: number, newTitle: string) => {
@@ -72,7 +73,7 @@ export default function TodoApp() {
         task.id === id ? { ...task, title: newTitle.trim() } : task
       );
       setTasks(updatedTasks);
-      sessionStorage.setItem("tasks", JSON.stringify(updatedTasks));
+      // sessionStorage.setItem("tasks", JSON.stringify(updatedTasks));
     }
   };
 
