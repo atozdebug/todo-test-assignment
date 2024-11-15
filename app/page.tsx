@@ -85,7 +85,7 @@ export default function TodoApp() {
             <Separator />
           </div>
           <div
-            className="flex flex-col  justify-between overflow-y-auto scroll-smooth "
+            className="flex flex-col flex-1  overflow-y-auto scroll-smooth "
             style={{ scrollbarWidth: "thin" }}
           >
             <AnimatePresence>
